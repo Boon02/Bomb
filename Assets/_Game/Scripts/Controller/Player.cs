@@ -5,23 +5,24 @@ using UnityEngine.InputSystem;
 public class Player : MonoBehaviour, IInteract, ICollect{
     
     [Range(0, 20)] [SerializeField] private float moveSpeed = 7f;
-    [SerializeField] private LayerMask colliderLayer;
+    private LayerMask colliderLayer;
 
-    public Action<BombID> OnSetBomb;
+    public Action<int, BombID> OnSetBomb;
     public Action OnDead;
 
     private bool isWalking;
     private InputPlayer inputPlayerActions;
     
-    private BombID _bombID;
+    private BombID bombID;
     private int health;
+    private int radiusBomb;
     
     public bool IsWalking => isWalking;
     public float MoveSpeed => moveSpeed;
+    public int RadiusBomb => radiusBomb;
 
-    public void Init(BombID bombID, int health) {
-        this._bombID = bombID;
-        this.health = health;
+    public void Init() {
+        
     }
     
     void Awake() {
@@ -37,7 +38,7 @@ public class Player : MonoBehaviour, IInteract, ICollect{
     }
 
     private void Interact_performed(InputAction.CallbackContext obj) {
-        OnSetBomb?.Invoke(_bombID);
+        OnSetBomb?.Invoke(radiusBomb, bombID);
     }
 
     // Start is called before the first frame update
@@ -103,5 +104,21 @@ public class Player : MonoBehaviour, IInteract, ICollect{
 
     public void SetSpeed(float moveSpeed) {
         this.moveSpeed = moveSpeed;
+    }
+
+    public void SetHealth(int health) {
+        this.health = health;
+    }
+
+    public void SetBombID(BombID bombID) {
+        this.bombID = bombID;
+    }
+
+    public void SetColliderLayer(LayerMask colliderLayer) {
+        this.colliderLayer = colliderLayer;
+    }
+
+    public void SetRadiusBomb(int radiusBomb) {
+        this.radiusBomb = radiusBomb;
     }
 }

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2160.4053, g: 2264.6074, b: 3288.0938, a: 1}
+  m_IndirectSpecularColor: {r: 2160.3896, g: 2264.5684, b: 3288.125, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -406,6 +406,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 502c2d3aaea1477981c65c84abefae3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  userSO: {fileID: 11400000, guid: dccfe29d23f4f2d4bbf4c2ca6e173ae0, type: 2}
   bombSO: {fileID: 11400000, guid: 24f36c94abbc2a04c97ac7664e7a9707, type: 2}
   _fireObjectBasePrefab: {fileID: -8156752327485862638, guid: c774bd831be316548a45e0bef19cc5b9,
     type: 3}

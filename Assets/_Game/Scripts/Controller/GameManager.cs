@@ -5,14 +5,14 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class GameManager : SingletonBehaviour<GameManager>{
-    public const float HEIGHT_OBJECT = 0.7f;       
-    public const float HEIGHT_PLAYER = 0.7f;        
+    public const float HEIGHT_OBJECT = 0.7f;
+    public const float HEIGHT_PLAYER = 0.7f;
 
-
+    [SerializeField] private UserSO userSO;
     [SerializeField] private BombSO bombSO;
     [SerializeField] private FireObjectBase _fireObjectBasePrefab;
     [SerializeField] private LayerMask colliderFireLayer;
-    
+
     [SerializeField] private Player playerPrefab;
     [SerializeField] private List<Transform> spawnPosList;
 
@@ -24,7 +24,14 @@ public class GameManager : SingletonBehaviour<GameManager>{
 
         var pos = spawnPosList[Random.Range(0, spawnPosList.Count)].position;
         player.transform.position = new Vector3(pos.x, HEIGHT_PLAYER, pos.z);
-        player.Init(BombID.Normal, 3);
+
+        player.SetHealth(userSO.UserInfo.Default_Hp);
+        player.SetSpeed(userSO.UserInfo.Default_Speed);
+        player.SetColliderLayer(userSO.UserInfo.Default_ColliderLayer);
+        player.SetRadiusBomb(userSO.UserInfo.Default_radiusBomb);
+        player.SetBombID(BombID.Normal);
+        player.Init();
+
         player.OnSetBomb += SetBomb;
         player.OnDead += OnPlayerDead;
         playerBomb = bombSO.GetBombPrefabFromID(BombID.Normal);
@@ -34,14 +41,13 @@ public class GameManager : SingletonBehaviour<GameManager>{
         Debug.Log("Player Dead, Game Stop!");
     }
 
-    private int radiusBomb = 2;
-    private void SetBomb(BombID obj) {
+    private void SetBomb(int radius, BombID obj) {
         Vector3 position = new Vector3(
-            (int)(player.transform.position.x + 0.5f), 
-            HEIGHT_OBJECT / 2, 
+            (int)(player.transform.position.x + 0.5f),
+            HEIGHT_OBJECT / 2,
             (int)(player.transform.position.z + 0.5f));
         var bomb = Instantiate(playerBomb, position, Quaternion.identity);
-        bomb.Init(radiusBomb);
+        bomb.Init(radius);
         bomb.OnBreak += Bomb_OnBreak;
     }
 
@@ -57,8 +63,8 @@ public class GameManager : SingletonBehaviour<GameManager>{
         bool isDirDown = false;
         bool isDirLeft = false;
         bool isDirRight = false;
-        
-        for (int i = 0; i < radiusBomb - 1; i++) {
+
+        for (int i = 0; i < posList[BombBase.Dir.top].Count - 1; i++) {
             if (!isDirTop) isDirTop = SetFire(posList[BombBase.Dir.top][i]);
             if (!isDirDown) isDirDown = SetFire(posList[BombBase.Dir.down][i]);
             if (!isDirLeft) isDirLeft = SetFire(posList[BombBase.Dir.left][i]);
@@ -73,22 +79,23 @@ public class GameManager : SingletonBehaviour<GameManager>{
         return fireObject.IsCastObject(colliderFireLayer);
     }
 
-    public void Collect(Player player1, ItemID itemID, int value, ValueTypeBooster type) {
+    public void Collect(Player collector, ItemID itemID, int value, ValueTypeBooster type) {
         switch (itemID) {
             case ItemID.Speed:
                 switch (type) {
                     case ValueTypeBooster.percent:
-                        player1.SetSpeed(player1.MoveSpeed * (1 + value * 1.0f / 100));
+                        collector.SetSpeed(collector.MoveSpeed * (1 + value * 1.0f / 100));
                         break;
                     case ValueTypeBooster.amount:
-                        player1.SetSpeed(player1.MoveSpeed + value);
+                        collector.SetSpeed(collector.MoveSpeed + value);
                         break;
                 }
+
                 break;
             case ItemID.Power:
                 switch (type) {
                     case ValueTypeBooster.amount:
-                        radiusBomb += value;
+                        collector.SetRadiusBomb(collector.RadiusBomb + value);
                         break;
                 }
 
