@@ -8,12 +8,15 @@ public class BombBase : MonoBehaviour{
     public Action<Dictionary<Dir, List<Vector3Int>>> OnBreak;
     private Coroutine _coroutine;
     private float countDownTime = 5f;
-
+    private Collider collider;
+    
     public void Init(int radius) {
         if (_coroutine != null) {
             StopCoroutine(_coroutine);
         }
 
+        collider = GetComponent<Collider>();
+        collider.enabled = true;
         boomPosList = new Dictionary<Dir, List<Vector3Int>>();
         _coroutine = StartCoroutine(CountBreakAsync(radius));
     }
@@ -31,6 +34,7 @@ public class BombBase : MonoBehaviour{
 
     private IEnumerator CountBreakAsync(int radius) {
         yield return new WaitForSeconds(countDownTime);
+        collider.enabled = false;
         Vector3Int currentPos = new Vector3Int((int)transform.position.x, 0, (int)transform.position.z);
         boomPosList.Add(Dir.mid, new List<Vector3Int>() { currentPos });
 

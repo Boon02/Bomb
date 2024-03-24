@@ -2,25 +2,20 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.UI;
 
 public class FireObjectBase : MonoBehaviour{
-    public Action<List<Transform>> OnTriggerTarget;
-    
     public bool IsCastObject(LayerMask colliderLayer) {
-        List<Transform> targets = new List<Transform>();
-        var hits = Physics.SphereCastAll(
-            transform.position, 
-            GameManager.HEIGHT_OBJECT/2, 
-            transform.forward, 
-            GameManager.HEIGHT_OBJECT/2,
-            colliderLayer);
+        var hits = Physics.OverlapSphere(transform.position, GameManager.HEIGHT_OBJECT/2, colliderLayer);
 
         if (hits.Length > 0) {
             foreach (var hit in hits) {
-                targets.Add(hit.transform);
+                if (hit.transform.TryGetComponent(out IInteract t)) {
+                    Debug.LogWarning($"{name} interact {t}");
+                    t.Interact();
+                }
             }
             
-            OnTriggerTarget?.Invoke(targets);
             return true;
         }
 

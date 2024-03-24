@@ -58,22 +58,21 @@ public class Player : MonoBehaviour, IInteract{
         var moveDir = new Vector3(inputVector.x, 0, inputVector.y);
 
         float moveDistance = MoveSpeed * Time.deltaTime;
-        float playerRadius = 0.7f;
         float playerHeight = 2f;
         
-        bool canMove = !Physics.BoxCast(transform.position, Vector3.one * playerRadius, moveDir, Quaternion.identity, moveDistance, colliderLayer);
+        bool canMove = !Physics.BoxCast(transform.position, Vector3.one * GameManager.HEIGHT_PLAYER / 2, moveDir, Quaternion.identity, moveDistance, colliderLayer);
         
         if(!canMove){
             // try move x
             Vector3 moveDirX = new Vector3(moveDir.x, 0, 0).normalized;
-            canMove = (moveDir.x < -0.5 || moveDir.x > 0.5) &&  !Physics.BoxCast(transform.position, Vector3.one * playerRadius, moveDirX, Quaternion.identity, moveDistance, colliderLayer);
+            canMove = (moveDir.x < -0.5 || moveDir.x > 0.5) &&  !Physics.BoxCast(transform.position, Vector3.one * GameManager.HEIGHT_PLAYER / 2, moveDirX, Quaternion.identity, moveDistance, colliderLayer);
             if (canMove) {
                 moveDir = moveDirX;
             }
             else {
                 // try move y
                 Vector3 moveDirY = new Vector3(0, 0, moveDir.y).normalized;
-                canMove = (moveDir.y < -0.5 || moveDir.y > 0.5) &&  !Physics.BoxCast(transform.position, Vector3.one * playerRadius, moveDirY, Quaternion.identity, moveDistance, colliderLayer);
+                canMove = (moveDir.y < -0.5 || moveDir.y > 0.5) &&  !Physics.BoxCast(transform.position, Vector3.one * GameManager.HEIGHT_PLAYER / 2, moveDirY, Quaternion.identity, moveDistance, colliderLayer);
                 if (canMove) {
                     moveDir = moveDirY;
                 }

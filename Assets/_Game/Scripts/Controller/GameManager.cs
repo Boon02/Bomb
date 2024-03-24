@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class GameManager : MonoBehaviour{
-    public const float HEIGHT_OBJECT = 1;
+public class GameManager : SingletonBehaviour<GameManager>{
+    public const float HEIGHT_OBJECT = 0.7f;       
+    public const float HEIGHT_PLAYER = 0.7f;        
+
 
     [SerializeField] private BombSO bombSO;
     [SerializeField] private FireObjectBase _fireObjectBasePrefab;
@@ -18,30 +20,26 @@ public class GameManager : MonoBehaviour{
     private BombBase playerBomb;
 
     private void Start() {
-        player = Instantiate(playerPrefab, spawnPosList[Random.Range(0, spawnPosList.Count)]);
+        player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+
+        var pos = spawnPosList[Random.Range(0, spawnPosList.Count)].position;
+        player.transform.position = new Vector3(pos.x, HEIGHT_PLAYER, pos.z);
         player.Init(BombID.Normal, 3);
         player.OnSetBomb += SetBomb;
         player.OnDead += OnPlayerDead;
         playerBomb = bombSO.GetBombPrefabFromID(BombID.Normal);
-        
-        _fireObjectBasePrefab.OnTriggerTarget += _fireObjectBasePrefab_OnTriggerTarget;
     }
 
     private void OnPlayerDead() {
         Debug.Log("Player Dead, Game Stop!");
     }
 
-    private void _fireObjectBasePrefab_OnTriggerTarget(List<Transform> targets) {
-        foreach (var target in targets) {
-            if (target.TryGetComponent(out IInteract t)) {
-                t.Interact();
-            }
-        }
-    }
-
     private int radiusBomb = 3;
     private void SetBomb(BombID obj) {
-        Vector3 position = new Vector3((int)player.transform.position.x, HEIGHT_OBJECT / 2, (int)player.transform.position.z);
+        Vector3 position = new Vector3(
+            (int)(player.transform.position.x + 0.5f), 
+            HEIGHT_OBJECT / 2, 
+            (int)(player.transform.position.z + 0.5f));
         var bomb = Instantiate(playerBomb, position, Quaternion.identity);
         bomb.Init(radiusBomb);
         bomb.OnBreak += Bomb_OnBreak;
@@ -70,6 +68,7 @@ public class GameManager : MonoBehaviour{
 
     private bool SetFire(Vector3 pos) {
         var fireObject = Instantiate(_fireObjectBasePrefab, pos, Quaternion.identity);
+        fireObject.name = $"{pos}";
         fireObject.transform.position = new Vector3(pos.x, HEIGHT_OBJECT / 2, pos.z);
         return fireObject.IsCastObject(colliderFireLayer);
     }
