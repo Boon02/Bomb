@@ -1,12 +1,10 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player : MonoBehaviour, IInteract{
+public class Player : MonoBehaviour, IInteract, ICollect{
     
-    [Range(0, 20)] [SerializeField] private float MoveSpeed = 7f;
+    [Range(0, 20)] [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private LayerMask colliderLayer;
 
     public Action<BombID> OnSetBomb;
@@ -19,6 +17,7 @@ public class Player : MonoBehaviour, IInteract{
     private int health;
     
     public bool IsWalking => isWalking;
+    public float MoveSpeed => moveSpeed;
 
     public void Init(BombID bombID, int health) {
         this._bombID = bombID;
@@ -57,7 +56,7 @@ public class Player : MonoBehaviour, IInteract{
         var inputVector = GetMovementVectorNormalized();
         var moveDir = new Vector3(inputVector.x, 0, inputVector.y);
 
-        float moveDistance = MoveSpeed * Time.deltaTime;
+        float moveDistance = moveSpeed * Time.deltaTime;
         float playerHeight = 2f;
         
         bool canMove = !Physics.BoxCast(transform.position, Vector3.one * GameManager.HEIGHT_PLAYER / 2, moveDir, Quaternion.identity, moveDistance, colliderLayer);
@@ -96,5 +95,13 @@ public class Player : MonoBehaviour, IInteract{
         if (IsDead) {
             OnDead?.Invoke();
         }
+    }
+
+    public void Collect(ItemID itemID, int value, ValueTypeBooster type) {
+        GameManager.Instance.Collect(this, itemID, value, type);
+    }
+
+    public void SetSpeed(float moveSpeed) {
+        this.moveSpeed = moveSpeed;
     }
 }

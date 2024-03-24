@@ -34,7 +34,7 @@ public class GameManager : SingletonBehaviour<GameManager>{
         Debug.Log("Player Dead, Game Stop!");
     }
 
-    private int radiusBomb = 3;
+    private int radiusBomb = 2;
     private void SetBomb(BombID obj) {
         Vector3 position = new Vector3(
             (int)(player.transform.position.x + 0.5f), 
@@ -71,6 +71,32 @@ public class GameManager : SingletonBehaviour<GameManager>{
         fireObject.name = $"{pos}";
         fireObject.transform.position = new Vector3(pos.x, HEIGHT_OBJECT / 2, pos.z);
         return fireObject.IsCastObject(colliderFireLayer);
+    }
+
+    public void Collect(Player player1, ItemID itemID, int value, ValueTypeBooster type) {
+        switch (itemID) {
+            case ItemID.Speed:
+                switch (type) {
+                    case ValueTypeBooster.percent:
+                        player1.SetSpeed(player1.MoveSpeed * (1 + value * 1.0f / 100));
+                        break;
+                    case ValueTypeBooster.amount:
+                        player1.SetSpeed(player1.MoveSpeed + value);
+                        break;
+                }
+                break;
+            case ItemID.Power:
+                switch (type) {
+                    case ValueTypeBooster.amount:
+                        radiusBomb += value;
+                        break;
+                }
+
+                break;
+            default:
+                Debug.LogError($"{this.name} missing Collect with item ID : {itemID}");
+                break;
+        }
     }
 }
 
